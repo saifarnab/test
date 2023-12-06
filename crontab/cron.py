@@ -38,7 +38,7 @@ def _email_sender(config: Configuration, templates: [Template], connected_accoun
             contact = contacts[config.contact_pointer]
 
             # send email via resend
-            resend_id = send_email_via_resend(config, contact, connected_account, templates[template_pointer])
+            resend_id, content = send_email_via_resend(config, contact, connected_account, templates[template_pointer])
             if not resend_id:
                 logging.error('email sent unsuccessful')
                 pointer += 1
@@ -46,7 +46,7 @@ def _email_sender(config: Configuration, templates: [Template], connected_accoun
 
             # insert email in db
             sent_email = SentEmail.objects.save_sent_email(templates[template_pointer], contact, connected_account,
-                                                           resend_id, '')
+                                                           resend_id, content)
             if not sent_email:
                 logging.error('email sent successfully but failed to insert in DB')
             else:
@@ -60,9 +60,6 @@ def _email_sender(config: Configuration, templates: [Template], connected_accoun
         # update pointer value
         config.contact_pointer = pointer
         config.save()
-
-        logging.info(f'waiting for {config.waiting_time} seconds to start sending emails')
-        time.sleep(config.waiting_time)
 
 
 def run():

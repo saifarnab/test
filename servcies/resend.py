@@ -26,7 +26,7 @@ def _get_resend_email_params(config: Configuration, contact: Contact, connected_
         "to": [f"{contact.primary_email}"],
         "subject": subject,
         "html": email,
-        "reply_to": connected_acc.reply_to if connected_acc.reply_to not in [None, ''] else config.primary_reply_to,
+        "reply_to": connected_acc.reply_to if connected_acc.reply_to not in [None, ''] else '',
         "headers": {}
     }
 
@@ -37,11 +37,11 @@ def _get_resend_email_params(config: Configuration, contact: Contact, connected_
 
 
 def send_email_via_resend(config: Configuration, contact: Contact, connected_acc: ConnectedAccount,
-                          template: Template) -> Union[str, None]:
+                          template: Template) -> (Union[str, None], str):
     try:
         body = _get_resend_email_params(config, contact, connected_acc, template)
         response = requests.post(settings.RESEND_API_URL, json=body, headers=_get_headers())
-        return json.loads(response.content).get('id', None)
+        return json.loads(response.content).get('id', None), body.get('html', '')
     except Exception as e:
         logging.exception(e)
         return None
