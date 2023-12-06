@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import Union
 
 import requests
@@ -25,7 +26,7 @@ def _get_resend_email_params(config: Configuration, contact: Contact, connected_
         "to": [f"{contact.primary_email}"],
         "subject": subject,
         "html": email,
-        "reply_to": [connected_acc.reply_to if connected_acc.reply_to else config.primary_reply_to],
+        "reply_to": connected_acc.reply_to if connected_acc.reply_to not in [None, ''] else config.primary_reply_to,
         "headers": {}
     }
 

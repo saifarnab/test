@@ -39,4 +39,11 @@ class ConfigurationAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    list_display = ['config',  'max_limit_per_day', 'waiting_time']
+    list_display = ['config', 'max_limit_per_day', 'waiting_time']
+
+
+@admin.register(models.EmailStatus)
+class EmailStatusAdmin(admin.ModelAdmin):
+    list_display = ['email', 'email_sent', 'email_delivered', 'email_complained', 'email_bounced', 'email_opened',
+                    'email_clicked', 'created_at']
+    ordering = ['-created_at']
