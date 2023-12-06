@@ -27,7 +27,7 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(models.SentEmail)
 class SentEmailAdmin(admin.ModelAdmin):
-    list_display = ['contact', 'connected_account', 'created_at']
+    list_display = ['contact', 'connected_account', 'resend_id', 'created_at']
     ordering = ['-created_at']
 
 

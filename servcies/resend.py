@@ -5,7 +5,7 @@ from typing import Union
 import requests
 from django.conf import settings
 
-from _applibs.email_template import get_email_template
+from _applibs.email_template import get_content
 from orm.models import Contact, ConnectedAccount, Template, Configuration
 
 
@@ -18,12 +18,13 @@ def _get_headers() -> dict:
 
 def _get_resend_email_params(config: Configuration, contact: Contact, connected_acc: ConnectedAccount,
                              template: Template) -> dict:
-    email_template = get_email_template(contact.first_name)
+    subject = get_content(contact, template.subject)
+    email = get_content(contact, template.content)
     params = {
         "from": f"{connected_acc.account_name} <{connected_acc.email}>",
         "to": [f"{contact.primary_email}"],
-        "subject": template.subject,
-        "html": email_template,
+        "subject": subject,
+        "html": email,
         "reply_to": [connected_acc.reply_to if connected_acc.reply_to else config.primary_reply_to],
         "headers": {}
     }

@@ -7,7 +7,8 @@ from orm.managers import (
     ConnectedAccountManager,
     ContactManager,
     SentEmailManager,
-    EmailStatusManager, ConfigurationManager
+    EmailStatusManager,
+    ConfigurationManager
 )
 
 
@@ -100,6 +101,7 @@ class SentEmail(models.Model):
     contact = models.ForeignKey(to=Contact, null=False, blank=False, on_delete=models.DO_NOTHING)
     connected_account = models.ForeignKey(to=ConnectedAccount, null=False, blank=False, on_delete=models.DO_NOTHING)
     resend_id = models.CharField(max_length=250, null=True, blank=True)
+    email_content = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     objects = SentEmailManager()
@@ -134,7 +136,7 @@ class EmailStatus(models.Model):
 
 class Configuration(models.Model):
     config = models.CharField(max_length=100, default='Config', editable=False)
-    pointer = models.IntegerField(default=0, editable=False)
+    contact_pointer = models.IntegerField(default=0)
     max_limit_per_day = models.IntegerField(default=50, help_text='maximum email send limit by an account')
     waiting_time = models.IntegerField(default=60, help_text='waiting time in seconds')
     primary_reply_to = models.CharField(max_length=250, null=True, blank=True, help_text='primary reply to email')
