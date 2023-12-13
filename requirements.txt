@@ -12,3 +12,4 @@ gunicorn==20.1.0
 django-tinymce==3.6.1
 pandas==2.0.3
 django-crontab==0.7.1
+django-ckeditor-6.7.0

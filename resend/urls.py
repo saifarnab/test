@@ -8,6 +8,6 @@ from django.views.static import serve
 
 urlpatterns = [
     re_path(settings.STATIC_URL[1:] + r"(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
-    path("admin/", admin.site.urls),
+    path("portal/", admin.site.urls),
     path("resend/", include('event.urls')),
 ]

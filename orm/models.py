@@ -7,12 +7,12 @@ from orm.managers import (
     ConnectedAccountManager,
     ContactManager,
     SentEmailManager,
-    EmailStatusManager,
-    ConfigurationManager
+    ConfigurationManager, FollowUpEmailManager
 )
 
 
-class Template(models.Model):
+class EmailVariant(models.Model):
+    title = models.CharField(max_length=250, blank=False, null=False)
     tag = models.CharField(max_length=100, unique=True, blank=False, null=False)
     subject = models.CharField(max_length=1500, null=False, blank=False)
     content = HTMLField()
@@ -22,11 +22,30 @@ class Template(models.Model):
     objects = TemplateManager()
 
     class Meta:
-        verbose_name = 'Template'
-        verbose_name_plural = 'Templates'
+        verbose_name = 'Email Variant'
+        verbose_name_plural = 'Email Variants'
 
     def __str__(self):
-        return self.tag
+        return self.title
+
+
+class FollowUpEmail(models.Model):
+    email = models.ForeignKey(to=EmailVariant, null=False, blank=False, on_delete=models.DO_NOTHING)
+    content = HTMLField()
+    wait_for = models.PositiveSmallIntegerField(default=1,
+                                                help_text=f'this followup email will wait specified '
+                                                          f'day from the original email')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    objects = FollowUpEmailManager()
+
+    class Meta:
+        verbose_name = 'FollowUp Email'
+        verbose_name_plural = 'FollowUp Emails'
+
+    def __str__(self):
+        return self.email.title
 
 
 class ConnectedAccount(models.Model):
@@ -65,7 +84,7 @@ class Contact(models.Model):
     lead_custom_company_address = models.CharField(max_length=250, null=True, blank=True)
     lead_custom_company_city = models.CharField(max_length=250, null=True, blank=True)
     lead_custom_company_country = models.CharField(max_length=250, null=True, blank=True)
-    lead_custom_company_description = models.CharField(max_length=250, null=True, blank=True)
+    lead_custom_company_description = models.CharField(max_length=2500, null=True, blank=True)
     lead_custom_company_industry = models.CharField(max_length=250, null=True, blank=True)
     lead_custom_company_li_profile = models.CharField(max_length=250, null=True, blank=True)
     lead_custom_company_linkedin = models.CharField(max_length=250, null=True, blank=True)
@@ -97,11 +116,19 @@ class Contact(models.Model):
 
 
 class SentEmail(models.Model):
-    template = models.ForeignKey(to=Template, null=False, blank=False, on_delete=models.DO_NOTHING)
+    template = models.ForeignKey(to=EmailVariant, null=True, blank=True, on_delete=models.DO_NOTHING)
+    followup_template = models.ForeignKey(to=FollowUpEmail, null=True, blank=True, on_delete=models.DO_NOTHING)
     contact = models.ForeignKey(to=Contact, null=False, blank=False, on_delete=models.DO_NOTHING)
     connected_account = models.ForeignKey(to=ConnectedAccount, null=False, blank=False, on_delete=models.DO_NOTHING)
     resend_id = models.CharField(max_length=250, null=True, blank=True)
     email_content = models.TextField(null=True, blank=True)
+    email_sent = models.BooleanField(default=False)
+    email_delivered = models.BooleanField(default=False)
+    email_complained = models.BooleanField(default=False)
+    email_bounced = models.BooleanField(default=False)
+    email_opened = models.BooleanField(default=False)
+    email_clicked = models.BooleanField(default=False)
+    is_followup = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
 
     objects = SentEmailManager()
@@ -114,31 +141,11 @@ class SentEmail(models.Model):
         return self.contact.name
 
 
-class EmailStatus(models.Model):
-    email = models.ForeignKey(to=SentEmail, null=False, blank=False, on_delete=models.DO_NOTHING)
-    email_sent = models.BooleanField(default=False)
-    email_delivered = models.BooleanField(default=False)
-    email_complained = models.BooleanField(default=False)
-    email_bounced = models.BooleanField(default=False)
-    email_opened = models.BooleanField(default=False)
-    email_clicked = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    objects = EmailStatusManager()
-
-    class Meta:
-        verbose_name = 'Email Status'
-        verbose_name_plural = 'Emails Status'
-
-    def __str__(self):
-        return self.email
-
-
 class Configuration(models.Model):
     config = models.CharField(max_length=100, default='Config', editable=False)
     contact_pointer = models.IntegerField(default=0)
-    max_limit_per_day = models.IntegerField(default=50, help_text='maximum email send limit by an account')
-    waiting_time = models.IntegerField(default=60, help_text='waiting time in seconds')
+    max_limit_per_day = models.IntegerField(default=50, help_text='maximum email send limit from an account')
+    waiting_time = models.IntegerField(default=1, help_text='waiting time in minutes')
     primary_reply_to = models.CharField(max_length=250, null=True, blank=True, help_text='primary reply to email')
 
     objects = ConfigurationManager()

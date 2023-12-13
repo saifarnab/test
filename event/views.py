@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status
 
-from orm.models import SentEmail, EmailStatus
+from orm.models import SentEmail, EmailVariant
 
 
 class EventTrackerApiView(APIView):
@@ -20,7 +20,7 @@ class EventTrackerApiView(APIView):
         # get sent email object & update status
         sent_email = SentEmail.objects.get_via_resend_id(email_id)
         if sent_email:
-            EmailStatus.objects.update_status(sent_email, email_type)
+            SentEmail.objects.update_status(sent_email, email_type)
 
         return status.HTTP_200_OK
 
