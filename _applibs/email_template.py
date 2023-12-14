@@ -1,6 +1,7 @@
 from jinja2 import Template
 
 from orm.models import Contact
+from django.conf import settings
 
 
 def _generate_data(contact: Contact):
@@ -40,11 +41,12 @@ def _generate_data(contact: Contact):
         'lead_custom_corporate_phone': contact.lead_custom_corporate_phone,
         'lead_custom_person_assigned': contact.lead_custom_person_assigned,
         'lead_custom_person_linkedin_url': contact.lead_custom_person_linkedin_url,
-        'lead_html_url': contact.lead_html_url
+        'lead_html_url': contact.lead_html_url,
+        'unsubscribe': f'<a href="{settings.HOST_URL}/resend/unsubscribe/{contact.lead_id}" class="button'
+                       f'">Unsubscribe</a>'
     }
 
 
 def get_content(contact: Contact, content: str) -> str:
     template = Template(content)
     return template.render(_generate_data(contact))
-

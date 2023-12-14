@@ -1,6 +1,6 @@
+from ckeditor.fields import RichTextField
 from django.db import models
 from django.utils import timezone
-from tinymce.models import HTMLField
 
 from orm.managers import (
     TemplateManager,
@@ -15,7 +15,7 @@ class EmailVariant(models.Model):
     title = models.CharField(max_length=250, blank=False, null=False)
     tag = models.CharField(max_length=100, unique=True, blank=False, null=False)
     subject = models.CharField(max_length=1500, null=False, blank=False)
-    content = HTMLField()
+    content = RichTextField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -31,7 +31,7 @@ class EmailVariant(models.Model):
 
 class FollowUpEmail(models.Model):
     email = models.ForeignKey(to=EmailVariant, null=False, blank=False, on_delete=models.DO_NOTHING)
-    content = HTMLField()
+    content = RichTextField()
     wait_for = models.PositiveSmallIntegerField(default=1,
                                                 help_text=f'this followup email will wait specified '
                                                           f'day from the original email')
@@ -103,6 +103,8 @@ class Contact(models.Model):
     lead_custom_person_linkedin_url = models.CharField(max_length=250, null=True, blank=True)
     lead_html_url = models.CharField(max_length=250, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    is_unsubscribe = models.BooleanField(default=False)
+    unsubscribe_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     objects = ContactManager()

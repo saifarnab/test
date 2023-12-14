@@ -17,7 +17,10 @@ class ConnectedAccountManager(models.Manager):
 
 class ContactManager(models.Manager):
     def get_active_contacts(self):
-        return self.filter(is_active=True).order_by('-created_at')
+        return self.filter(is_active=True, is_unsubscribe=False).order_by('-created_at')
+
+    def unsubscribe(self, lead_id):
+        self.filter(lead_id=lead_id).update(is_unsubscribe=True, unsubscribe_date=timezone.now())
 
 
 class SentEmailManager(models.Manager):
@@ -29,17 +32,20 @@ class SentEmailManager(models.Manager):
                            email_content=email_content)
 
     def save_followup_email(self, template, contact, connected_account, resend_id, email_content):
-        return self.create(followup_template=template, contact=contact, connected_account=connected_account, resend_id=resend_id,
+        return self.create(followup_template=template, contact=contact, connected_account=connected_account,
+                           resend_id=resend_id,
                            email_content=email_content, is_followup=True)
 
     def get_via_resend_id(self, resend_id: str):
         return self.filter(resend_id=resend_id).last()
 
     def get_emails_need_to_send_followup_email(self):
-        return self.filter(email_complained=False, email_bounced=False, is_followup=False)
+        return self.filter(email_complained=False, email_bounced=False, is_followup=False,
+                           contact__is_unsubscribe=False)
 
     def get_followup_email(self, followup_template, contact, connected_account):
-        return self.filter(followup_template=followup_template, contact=contact, connected_account=connected_account).last()
+        return self.filter(followup_template=followup_template, contact=contact,
+                           connected_account=connected_account).last()
 
     def update_status(self, email, event_type: str):
 

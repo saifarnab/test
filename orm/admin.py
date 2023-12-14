@@ -61,7 +61,7 @@ class SentEmailAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         return True if settings.STAGE in ['development', 'uat'] else False
 
-    list_display = ['contact', 'connected_account', 'resend_id', 'created_at']
+    list_display = ['contact', 'connected_account', 'resend_id', 'is_followup', 'created_at']
     ordering = ['-created_at']
 
 
