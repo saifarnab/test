@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  # Django web application service
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8009
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  # MySQL database service
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_HOST: ${DATABASE_HOST}
+      MYSQL_PORT: ${DATABASE_PORT}
