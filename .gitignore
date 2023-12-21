@@ -273,6 +273,7 @@ tags
 /media
 /banners
 /banner
+mysql_data
 
 #**/migrations/**
 #!**/migrations

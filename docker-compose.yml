@@ -1,25 +1,30 @@
 version: '3'
 
 services:
-  # Django web application service
+  # Django web application
   web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8009
+    image: python:3.9
     volumes:
-      - .:/app
+      - ./app:/app
     ports:
       - "8000:8000"
-    env_file:
-      - .env
+    command: bash -c "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
-
-  # MySQL database service
-  db:
-    image: mysql:latest
     environment:
-      MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_USER: ${DATABASE_USER}
-      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_HOST: ${DATABASE_HOST}
-      MYSQL_PORT: ${DATABASE_PORT}
+      - DATABASE_URL=mysql://user:password@db:3307/dbname
+
+  # MySQL database
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: dbname
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+
+  # Additional services (e.g., Celery, Redis, etc.) can be added as needed

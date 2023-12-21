@@ -15,6 +15,7 @@ COPY ./requirements.txt ./
 
 
 RUN apt-get update
+RUN apt-get install python3-dev default-libmysqlclient-dev gcc  -y
 RUN apt-get install build-essential tzdata -y
 RUN python3 -m pip install -r requirements.txt
 RUN apt-get remove build-essential -y
@@ -27,4 +28,4 @@ COPY . .
 EXPOSE 8009
 
 # Define the default command to run when the container starts
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8009"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
