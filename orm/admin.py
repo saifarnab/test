@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django import forms
+from django.contrib.admin.widgets import FilteredSelectMultiple
+from bs4 import BeautifulSoup
 
 from orm import models
 
@@ -8,16 +11,39 @@ admin.site.unregister(User)
 admin.site.unregister(Group)
 
 
+class EmailForm(forms.ModelForm):
+    class Meta:
+        model = models.EmailVariant
+        fields = '__all__'
+        widgets = {
+            'tag': FilteredSelectMultiple("Multi Select Field", is_stacked=False),
+        }
+
+
 @admin.register(models.EmailVariant)
 class EmailVariantAdmin(admin.ModelAdmin):
-    list_display = ['title', 'tag', 'is_active', 'created_at']
+    form = EmailForm
+    list_display = ['title', 'subject', 'is_active', 'created_at']
+    search_fields = ['title', 'subject']
     ordering = ['-created_at']
+
+    def save_model(self, request, obj, form, change):
+        soup = BeautifulSoup(obj.subject, 'html.parser')
+        obj.subject = soup.get_text()
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.FollowUpEmail)
 class FollowUpEmailAdmin(admin.ModelAdmin):
-    list_display = ['email', 'wait_for', 'is_active', 'created_at']
+    form = EmailForm
+    search_fields = ['title', 'subject']
+    list_display = ['title', 'subject', 'wait_for', 'is_active', 'created_at']
     ordering = ['-created_at']
+
+    def save_model(self, request, obj, form, change):
+        soup = BeautifulSoup(obj.subject, 'html.parser')
+        obj.subject = soup.get_text()
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.ConnectedAccount)

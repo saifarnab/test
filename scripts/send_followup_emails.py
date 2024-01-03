@@ -22,14 +22,19 @@ def _followup_email_sender(config: Configuration):
     # get original emails
     emails = SentEmail.objects.get_emails_need_to_send_followup_email()
     if not emails:
+        logging.info(f'no followup emails to send')
         return
 
     for email in emails:
 
         # get original emails
         followup_emails = FollowUpEmail.objects.get_active_followup_emails(email.template)
+        if not followup_emails:
+            logging.info(f'no followup emails to send')
+            continue
         followup_email = _get_followup_email(followup_emails, email.created_at)
         if not followup_email:
+            logging.info(f'followup email does not match condition to send to {email.contact.name}')
             continue
 
         # check already sent a followup email
@@ -41,7 +46,7 @@ def _followup_email_sender(config: Configuration):
         resend_id, content = send_followup_email_via_resend(config, email.contact, email.connected_account,
                                                             followup_email)
         if not resend_id:
-            logging.error('email sent unsuccessful')
+            logging.info(f'followup email unsuccessful send to {email.contact.name}')
             continue
 
         # insert email in db
@@ -55,7 +60,6 @@ def run():
     try:
         config = Configuration.objects.get_config()
         _followup_email_sender(config)
-        logging.info("successfully send followup emails")
 
     except Exception as err:
         logging.exception(err)

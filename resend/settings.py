@@ -46,10 +46,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
-    'django_crontab',
+    "multiselectfield",
+    # 'django_crontab',
     # "tinymce",
     'ckeditor',
-    'crontab',
+    # 'crontab',
     'event',
     "orm",
 ]
@@ -172,10 +173,7 @@ CKEDITOR_CONFIGS = {
         },
 }
 
-# scheduler
-CRONJOBS = [
-    (os.getenv("CRON_SCHEDULE"), 'crontab.cron.run')
-]
+TAGS = os.getenv("TAGS").split(",")
 
 # Internationalization
 LANGUAGE_CODE = os.getenv("LANGUAGE_CODE")

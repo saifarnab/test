@@ -1,5 +1,5 @@
 """
-python3 manage.py runscript send_email
+python3 manage.py runscript send_emails
 RES: Send email periodically
 """
 import logging

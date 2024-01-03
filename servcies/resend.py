@@ -1,16 +1,11 @@
-import html
 import json
 import logging
-import random
-import time
-import markdown
-
 from typing import Union
 
+import markdown
 import requests
-from django.conf import settings
-
 from _applibs.email_template import get_content
+from django.conf import settings
 from orm.models import Contact, ConnectedAccount, EmailVariant, Configuration, FollowUpEmail
 
 
@@ -27,8 +22,7 @@ def _get_resend_email_params(config: Configuration, contact: Contact, connected_
     email = get_content(contact, email_variant.content)
     email_html = markdown.markdown(email).replace("&lt;", '<').replace("&gt;", '>').replace("&quot;", '\"').replace(
         "&quot;", '\"').replace('<pre>', '').replace('</pre>', '').strip()
-    # print(email_html)
-    # time.sleep(10000)
+
     params = {
         "from": f"{connected_acc.account_name} <{connected_acc.email}>",
         "to": [f"{contact.primary_email}"],
@@ -46,7 +40,7 @@ def _get_resend_email_params(config: Configuration, contact: Contact, connected_
 
 def _get_resend_followup_email_params(config: Configuration, contact: Contact, connected_acc: ConnectedAccount,
                                       followup_email: FollowUpEmail) -> dict:
-    subject = get_content(contact, followup_email.email.subject)
+    subject = get_content(contact, followup_email.subject if followup_email.subject else followup_email.email.subject)
     email = get_content(contact, followup_email.content)
     email_html = markdown.markdown(email).replace("&lt;", '<').replace("&gt;", '>').replace("&quot;", '\"').replace(
         "&quot;", '\"').replace('<pre>', '').replace('</pre>', '').strip()

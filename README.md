@@ -11,6 +11,8 @@ How to run:
 3. RUN --> python3 manage.py runscript config_init
 4. RUN --> python3 manage.py runscript insert_contacts
 5. RUN --> python3 manage.py runscript insert_connected_accounts
+5. RUN --> python3 manage.py runscript send_emails (perodically run it)
+5. RUN --> python3 manage.py runscript send_followup_emails (perodically run it)
 ```
 
 ```
@@ -19,18 +21,11 @@ Generate user
 ```
 
 ```
-Generate cron job
-1. RUN --> python3 manage.py crontab add (to add)
-2. RUN --> python3 manage.py crontab remove (to remove)
-3. RUN --> python3 manage.py crontab restart (to restart)
-```
-
-```
 Run project:
 1. RUN --> python3 manage.py runserver 0.0.0.0:8000
 ```
 
 ```
-Admin Pannel:
-1. VISIT --> http://0.0.0.0:8000/admin
+Portal:
+1. VISIT --> http://0.0.0.0:8000/portal
 ```

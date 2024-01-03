@@ -1,6 +1,8 @@
 from ckeditor.fields import RichTextField
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
+from multiselectfield import MultiSelectField
 
 from orm.managers import (
     TemplateManager,
@@ -13,9 +15,14 @@ from orm.managers import (
 
 class EmailVariant(models.Model):
     title = models.CharField(max_length=250, blank=False, null=False)
-    tag = models.CharField(max_length=100, unique=True, blank=False, null=False)
-    subject = models.CharField(max_length=1500, null=False, blank=False)
-    content = RichTextField()
+    tag = MultiSelectField(choices=[(choice, choice) for choice in settings.TAGS], max_length=1000, null=True)
+    subject = RichTextField(null=False, blank=False,
+                            help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} "
+                                      "| {{primary_email}} "
+                                      "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
+    content = RichTextField(
+        help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} | {{primary_email}} "
+                  "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -25,13 +32,25 @@ class EmailVariant(models.Model):
         verbose_name = 'Email Variant'
         verbose_name_plural = 'Email Variants'
 
+    def save(self, *args, **kwargs):
+
+        super(EmailVariant, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.title
 
 
 class FollowUpEmail(models.Model):
     email = models.ForeignKey(to=EmailVariant, null=False, blank=False, on_delete=models.DO_NOTHING)
-    content = RichTextField()
+    title = models.CharField(max_length=250, blank=False, null=False)
+    tag = MultiSelectField(choices=[(choice, choice) for choice in settings.TAGS], max_length=1000, null=True, blank=True)
+    subject = RichTextField(null=True, blank=True,
+                            help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} "
+                                      "| {{primary_email}} "
+                                      "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
+    content = RichTextField(
+        help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} | {{primary_email}} "
+                  "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
     wait_for = models.PositiveSmallIntegerField(default=1,
                                                 help_text=f'this followup email will wait specified '
                                                           f'day from the original email')
@@ -45,7 +64,7 @@ class FollowUpEmail(models.Model):
         verbose_name_plural = 'FollowUp Emails'
 
     def __str__(self):
-        return self.email.title
+        return self.title
 
 
 class ConnectedAccount(models.Model):
@@ -131,6 +150,9 @@ class SentEmail(models.Model):
     email_opened = models.BooleanField(default=False)
     email_clicked = models.BooleanField(default=False)
     is_followup = models.BooleanField(default=False)
+    is_lead_replied = models.BooleanField(default=False)
+    is_automated_reply = models.BooleanField(default=False)
+    is_positive_reply = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
 
     objects = SentEmailManager()
