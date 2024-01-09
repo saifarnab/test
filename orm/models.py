@@ -123,6 +123,8 @@ class Contact(models.Model):
     lead_html_url = models.CharField(max_length=250, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_unsubscribe = models.BooleanField(default=False)
+    is_bounced = models.BooleanField(default=False)
+    is_replied = models.BooleanField(default=False)
     unsubscribe_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 

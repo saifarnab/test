@@ -16,18 +16,21 @@ class EventTrackerApiView(APIView):
     def _process(self):
         # get data
         request_data = self.request.data
-        email_type = request_data.get('type')
+        event_type = request_data.get('type')
         email_id = request_data.get('data').get('email_id')
 
         # get sent email object & update status
         sent_email = SentEmail.objects.get_via_resend_id(email_id)
         if sent_email:
-            Contact.objects.unsubscribe(sent_email.contact.lead_id)
-            SentEmail.objects.update_status(sent_email, email_type)
+            SentEmail.objects.update_status(email_id, event_type)
+
+        # if email bounced
+        if event_type == 'email.bounced':
+            Contact.objects.bounced(sent_email.contact.lead_id)
 
         return Response(status=status.HTTP_200_OK)
 
-    def get(self, request):
+    def post(self, request):
         return self._process()
 
 

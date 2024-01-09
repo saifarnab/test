@@ -17,10 +17,14 @@ class ConnectedAccountManager(models.Manager):
 
 class ContactManager(models.Manager):
     def get_active_contacts(self):
-        return self.filter(is_active=True, is_unsubscribe=False).order_by('-created_at')
+        return self.filter(is_active=True, is_unsubscribe=False, is_bounced=False, is_replied=False).order_by(
+            '-created_at')
 
     def unsubscribe(self, lead_id):
         self.filter(lead_id=lead_id).update(is_unsubscribe=True, unsubscribe_date=timezone.now())
+
+    def bounced(self, lead_id):
+        self.filter(lead_id=lead_id).update(is_bounced=True)
 
 
 class SentEmailManager(models.Manager):
@@ -47,9 +51,9 @@ class SentEmailManager(models.Manager):
         return self.filter(followup_template=followup_template, contact=contact,
                            connected_account=connected_account).last()
 
-    def update_status(self, email, event_type: str):
+    def update_status(self, email_id, event_type: str):
 
-        obj = self.filter(email=email).last()
+        obj = self.filter(resend_id=email_id).last()
         if obj:
             if event_type == 'email.sent':
                 obj.email_sent = True
