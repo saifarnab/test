@@ -16,10 +16,10 @@ from orm.managers import (
 class EmailVariant(models.Model):
     title = models.CharField(max_length=250, blank=False, null=False)
     tag = MultiSelectField(choices=[(choice, choice) for choice in settings.TAGS], max_length=1000, null=True)
-    subject = RichTextField(null=False, blank=False,
-                            help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} "
-                                      "| {{primary_email}} "
-                                      "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
+    subject = models.TextField(null=False, blank=False,
+                               help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} "
+                                         "| {{primary_email}} "
+                                         "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
     content = RichTextField(
         help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} | {{primary_email}} "
                   "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
@@ -33,7 +33,6 @@ class EmailVariant(models.Model):
         verbose_name_plural = 'Email Variants'
 
     def save(self, *args, **kwargs):
-
         super(EmailVariant, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -41,13 +40,13 @@ class EmailVariant(models.Model):
 
 
 class FollowUpEmail(models.Model):
-    email = models.ForeignKey(to=EmailVariant, null=False, blank=False, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=250, blank=False, null=False)
-    tag = MultiSelectField(choices=[(choice, choice) for choice in settings.TAGS], max_length=1000, null=True, blank=True)
-    subject = RichTextField(null=True, blank=True,
-                            help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} "
-                                      "| {{primary_email}} "
-                                      "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
+    tag = MultiSelectField(choices=[(choice, choice) for choice in settings.TAGS], max_length=1000, null=True,
+                           blank=True)
+    subject = models.TextField(null=True, blank=True,
+                               help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} "
+                                         "| {{primary_email}} "
+                                         "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
     content = RichTextField(
         help_text="{{name}} | {{first_name}} | {{last_name}} | {{primary_phone}} | {{primary_email}} "
                   "| {{primary_phone}} | {{lead_display_name}} | {{lead_custom_company_address}}")
@@ -172,7 +171,8 @@ class Configuration(models.Model):
     contact_pointer = models.IntegerField(default=0)
     max_limit_per_day = models.IntegerField(default=50, help_text='maximum email send limit from an account')
     waiting_time = models.IntegerField(default=1, help_text='waiting time in minutes')
-    primary_reply_to = models.CharField(max_length=250, null=True, blank=True, help_text='primary reply to email')
+    primary_reply_to = models.CharField(max_length=250, null=True, blank=True,
+                                        help_text='primary reply to email (optional)')
 
     objects = ConfigurationManager()
 

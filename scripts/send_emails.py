@@ -70,7 +70,7 @@ def run():
         contacts = Contact.objects.get_active_contacts()
         connected_accounts = ConnectedAccount.objects.get_active_accounts()
         _email_sender(config, templates, connected_accounts, contacts)
-        logging.info("successfully send email to all the contacts")
+        logging.info("All contacts have received emails")
 
     except Exception as err:
         logging.exception(err)

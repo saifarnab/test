@@ -24,9 +24,9 @@ class EventTrackerApiView(APIView):
         if sent_email:
             SentEmail.objects.update_status(email_id, event_type)
 
-        # if email bounced
-        if event_type == 'email.bounced':
-            Contact.objects.bounced(sent_email.contact.lead_id)
+            # if email bounced
+            if event_type == 'email.bounced':
+                Contact.objects.bounced(sent_email.contact.lead_id)
 
         return Response(status=status.HTTP_200_OK)
 

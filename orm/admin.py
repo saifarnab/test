@@ -58,6 +58,7 @@ class ConnectedAccountAdmin(admin.ModelAdmin):
         return True if settings.STAGE in ['development', 'uat'] else False
 
     list_display = ['account_name', 'email', 'reply_to', 'is_active', 'created_at']
+    search_fields = ['account_name', 'email']
     ordering = ['-created_at']
 
 
@@ -73,6 +74,7 @@ class ContactAdmin(admin.ModelAdmin):
         return True if settings.STAGE in ['development', 'uat'] else False
 
     list_display = ['name', 'primary_email', 'is_active', 'created_at']
+    search_fields = ['name', 'primary_email']
     ordering = ['-created_at']
 
 
@@ -88,6 +90,7 @@ class SentEmailAdmin(admin.ModelAdmin):
         return True if settings.STAGE in ['development', 'uat'] else False
 
     list_display = ['contact', 'connected_account', 'resend_id', 'is_followup', 'created_at']
+    search_fields = ['resend_id', 'contact__name', 'contact__email']
     ordering = ['-created_at']
 
 

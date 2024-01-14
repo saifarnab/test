@@ -4,6 +4,7 @@ RES: Send email periodically
 """
 import datetime
 import logging
+import time
 
 from orm.models import Configuration, SentEmail, FollowUpEmail
 from servcies.resend import send_followup_email_via_resend
@@ -32,6 +33,7 @@ def _followup_email_sender(config: Configuration):
         if not followup_emails:
             logging.info(f'no followup emails to send')
             continue
+
         followup_email = _get_followup_email(followup_emails, email.created_at)
         if not followup_email:
             logging.info(f'followup email does not match condition to send to {email.contact.name}')

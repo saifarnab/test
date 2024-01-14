@@ -65,7 +65,7 @@ class SentEmailManager(models.Manager):
                 obj.email_delivered = True
             elif event_type == 'email.bounced':
                 obj.email_bounced = True
-            elif event_type == 'email.opend':
+            elif event_type == 'email.opened':
                 obj.email_opened = True
             elif event_type == 'email.clicked':
                 obj.email_clicked = True
@@ -81,4 +81,4 @@ class ConfigurationManager(models.Manager):
 class FollowUpEmailManager(models.Manager):
 
     def get_active_followup_emails(self, email):
-        return self.filter(email=email, is_active=True).order_by('wait_for')
+        return self.filter(is_active=True).order_by('wait_for')
